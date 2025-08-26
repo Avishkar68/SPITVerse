@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+/* Tell Tailwind to use class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Global Light/Dark Theme */
+@layer base {
+  html {
+    @apply bg-white text-gray-900 transition-colors duration-300;
+  }
+
+  html.dark {
+    background-color: #1A1A1A; /* Your custom dark bg */
+    color: #E5E5E5; /* Soft gray text */
+  }
+
+  body {
+    @apply transition-colors duration-300;
+  }
+}
