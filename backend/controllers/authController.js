@@ -6,16 +6,19 @@ const SALT_ROUNDS = 10;
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
 
-    // validate college email
+    if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
+    
+    // normalize email
+    const normalizedEmail = email.trim().toLowerCase();
+    
     const allowedDomain = '@spit.ac.in';
-    if (!email.endsWith(allowedDomain)) {
+    if (!normalizedEmail.endsWith(allowedDomain)) {
       return res.status(403).json({ message: `Only ${allowedDomain} emails are allowed` });
     }
-
-    let user = await User.findOne({ email });
+    
+    let user = await User.findOne({ email: normalizedEmail });
+    
 
     if (!user) {
       // create user
