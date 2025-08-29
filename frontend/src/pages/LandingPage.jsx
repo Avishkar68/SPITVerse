@@ -59,7 +59,7 @@ const handleEnter = async () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <Navbar />
+      <Navbar setIsLoggedIn={setIsLoggedIn} />
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Section */}

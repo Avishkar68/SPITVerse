@@ -1,6 +1,6 @@
 import React from "react";
 import { MdOutlineLightMode, MdOutlineDarkMode } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [darkMode, setDarkMode] = React.useState(false);
@@ -18,29 +18,31 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("data");
+   
     navigate("/"); 
+    window.location.reload()
   };
 
   return (
     <nav className="flex items-center justify-between px-6 py-3 bg-white dark:bg-[#1A1A1A] transition-colors duration-300">
       {/* Brand */}
-      <div
+      <Link
+        to="/"
         className="text-2xl font-bold text-blue-600 dark:text-blue-400 cursor-pointer"
-        onClick={() => navigate("/")}
       >
         SpitVerse
-      </div>
+      </Link>
 
       <div className="flex items-center gap-4">
         {/* If logged in, show buttons */}
         {isLoggedIn ? (
           <>
-            <button
-              onClick={() => navigate("/create-project")}
+            <Link
+              to="/create-project"
               className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700"
             >
               Create Project
-            </button>
+            </Link>
             <button
               onClick={handleLogout}
               className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"
