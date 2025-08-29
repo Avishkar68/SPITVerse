@@ -40,7 +40,7 @@ const LandingPage = ({ setIsLoggedIn }) => {
           {statsData.map((stat, idx) => (
             <div
               key={idx}
-              className="p-6 bg-gray-100 dark:bg-[#10101041] rounded-xl shadow-md text-center"
+              className="p-6 bg-transparent dark:bg-[#10101041] rounded-xl shadow-sm text-center"
             >
               <p
                 className={`text-2xl sm:text-3xl font-bold ${stat.color}`}
@@ -65,7 +65,7 @@ const LandingPage = ({ setIsLoggedIn }) => {
         </p>
 
         {/* Join Community Form */} 
-        <div className="bg-gray-100 dark:bg-[#10101041] p-6 sm:p-8 rounded-xl shadow-md w-full max-w-md text-center">
+        <div className="bg-transparent dark:bg-[#10101041] p-6 sm:p-8 rounded-xl shadow-sm w-full max-w-md text-center">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">
             Join the Community
           </h2>
@@ -74,7 +74,7 @@ const LandingPage = ({ setIsLoggedIn }) => {
             placeholder="Your name or nickname"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
+            className="w-full p-3 rounded-lg border border-gray-500 dark:border-gray-500 bg-transparent dark:bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
           />
           <button
             onClick={handleEnter}
