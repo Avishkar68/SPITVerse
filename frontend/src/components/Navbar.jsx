@@ -14,7 +14,7 @@ const Navbar = () => {
   }, [darkMode]);
 
   return (
-    <nav className="flex items-center justify-between px-6 py-3 bg-white dark:bg-[#1A1A1A] shadow-md transition-colors duration-300">
+    <nav className="flex items-center justify-between px-6 py-3 bg-white dark:bg-[#1A1A1A]  transition-colors duration-300">
       {/* Brand */}
       <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
         SpitVerse

@@ -3,7 +3,8 @@ import React, { useState } from "react";
 
 const LandingPage = ({ setIsLoggedIn }) => {
   const [name, setName] = useState("");
-
+  const [password,setPassword] = useState("")
+  const [email,setEmail] = useState("")
   const statsData = [
     {
       value: "1.2k+",
@@ -23,7 +24,7 @@ const LandingPage = ({ setIsLoggedIn }) => {
   ];
 
   const handleEnter = () => {
-    if (name.trim() !== "") {
+    if (name.trim() && password.trim() !== "") {
       setIsLoggedIn(true);
     }
   };
@@ -34,13 +35,13 @@ const LandingPage = ({ setIsLoggedIn }) => {
       <Navbar />
 
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-5xl mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-5xl mb-8">
           {statsData.map((stat, idx) => (
             <div
               key={idx}
-              className="p-6 bg-transparent dark:bg-[#10101041] rounded-xl shadow-sm text-center"
+              className="p-4 bg-transparent dark:bg-[#10101041] rounded-xl shadow-sm text-center"
             >
               <p
                 className={`text-2xl sm:text-3xl font-bold ${stat.color}`}
@@ -55,26 +56,40 @@ const LandingPage = ({ setIsLoggedIn }) => {
         </div>
 
         {/* Welcome Section */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 text-center">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-center">
           Welcome to SPITverse
         </h1>
-        <p className="text-gray-700 dark:text-gray-300 text-center max-w-2xl mb-10 text-sm sm:text-base">
+        <p className="text-gray-700 dark:text-gray-300 text-center max-w-2xl mb-4 text-sm sm:text-base">
           Connect with your fellow students, share ideas, and build the future together.
           Choose a feature below to get started. <br />
           <span className="italic">The exclusive student social platform</span>
         </p>
 
         {/* Join Community Form */} 
-        <div className="bg-transparent dark:bg-[#10101041] p-6 sm:p-8 rounded-xl shadow-sm w-full max-w-md text-center">
+        <div className="bg-transparent dark:bg-[#10101041] p-4 sm:p-4 rounded-xl shadow-2xs w-full max-w-md text-center">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">
             Join the Community
           </h2>
           <input
             type="text"
-            placeholder="Your name or nickname"
+            placeholder="Your nickname or username"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 rounded-lg border border-gray-500 dark:border-gray-500 bg-transparent dark:bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
+            className="w-full p-3 rounded-lg bg-transparent dark:bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
+          />
+          <input
+            type="text"
+            placeholder="Your email here"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 rounded-lg  bg-transparent dark:bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
+          />
+          <input
+            type="text"
+            placeholder="Your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 rounded-lg  bg-transparent dark:bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
           />
           <button
             onClick={handleEnter}
