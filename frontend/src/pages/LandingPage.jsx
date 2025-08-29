@@ -1,65 +1,48 @@
-import Navbar from "../components/Navbar";
 import React, { useState } from "react";
+import Navbar from "../components/Navbar";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const LandingPage = ({ setIsLoggedIn }) => {
+const LandingPage = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const statsData = [
-    { value: "1.2k+", label: "Active Students", color: "text-blue-500" },
-    { value: "500+", label: "Daily Posts", color: "text-green-500" },
-    { value: "50+", label: "Active Projects", color: "text-orange-500" },
-  ];
+  const navigate = useNavigate();
 
-  // 🔹 API call on login
-const handleEnter = async () => {
-  console.log("Login button clicked ✅");
+  const handleEnter = async () => {
+    if (!name.trim() || !password.trim() || !email.trim()) {
+      setError("Please fill in all fields");
+      return;
+    }
 
-  if (!name.trim() || !password.trim() || !email.trim()) {
-    setError("Please fill in all fields");
-    console.log("❌ Missing fields");
-    return;
-  }
+    setError("");
+    setLoading(true);
 
-  setError("");
-  setLoading(true);
+    try {
+      const res = await axios.post("http://localhost:4000/api/auth/login", {
+        name,
+        email,
+        password,
+      });
 
-  try {
-    console.log("📡 Sending request to API...");
+      localStorage.setItem("data", JSON.stringify(res.data));
+      // Redirect to feed
+      navigate("/feed");
+      window.location.reload()
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const res = await axios.post("http://localhost:4000/api/auth/login", {
-      name,
-      email,
-      password,
-    });
-
-    console.log("✅ Response received", res);
-
-    // Agar tumhe sirf data store karna hai:
-    localStorage.setItem("data", JSON.stringify(res.data));
-
-    console.log("📩 Response JSON:", res.data);
-
-    setIsLoggedIn(true);
-  } catch (err) {
-    console.error("❌ Error:", err);
-    setError(
-      err.response?.data?.message || "Login failed. Please try again."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
+  const statsData = [{ value: "1.2k+", label: "Active Students", color: "text-blue-500" }, { value: "500+", label: "Daily Posts", color: "text-green-500" }, { value: "50+", label: "Active Projects", color: "text-orange-500" },];
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <Navbar setIsLoggedIn={setIsLoggedIn} />
+      <Navbar />
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Section */}
@@ -118,11 +101,7 @@ const handleEnter = async () => {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-3 rounded-lg bg-transparent border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
           />
-          <button
-            onClick={handleEnter}
-            disabled={loading}
-            className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold transition-colors text-sm sm:text-base"
-          >
+          <button onClick={handleEnter}>
             {loading ? "Logging in..." : "Enter SPITverse"}
           </button>
         </div>
