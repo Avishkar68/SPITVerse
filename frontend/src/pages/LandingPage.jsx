@@ -1,40 +1,66 @@
 import Navbar from "../components/Navbar";
 import React, { useState } from "react";
+import axios from "axios";
 
 const LandingPage = ({ setIsLoggedIn }) => {
   const [name, setName] = useState("");
-  const [password,setPassword] = useState("")
-  const [email,setEmail] = useState("")
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const statsData = [
-    {
-      value: "1.2k+",
-      label: "Active Students",
-      color: "text-blue-500",
-    },
-    {
-      value: "500+",
-      label: "Daily Posts",
-      color: "text-green-500",
-    },
-    {
-      value: "50+",
-      label: "Active Projects",
-      color: "text-orange-500",
-    },
+    { value: "1.2k+", label: "Active Students", color: "text-blue-500" },
+    { value: "500+", label: "Daily Posts", color: "text-green-500" },
+    { value: "50+", label: "Active Projects", color: "text-orange-500" },
   ];
 
-  const handleEnter = () => {
-    if (name.trim() && password.trim() !== "") {
-      setIsLoggedIn(true);
-    }
-  };
+  // 🔹 API call on login
+const handleEnter = async () => {
+  console.log("Login button clicked ✅");
+
+  if (!name.trim() || !password.trim() || !email.trim()) {
+    setError("Please fill in all fields");
+    console.log("❌ Missing fields");
+    return;
+  }
+
+  setError("");
+  setLoading(true);
+
+  try {
+    console.log("📡 Sending request to API...");
+
+    const res = await axios.post("http://localhost:4000/api/auth/login", {
+      name,
+      email,
+      password,
+    });
+
+    console.log("✅ Response received", res);
+
+    // Agar tumhe sirf data store karna hai:
+    localStorage.setItem("data", JSON.stringify(res.data));
+
+    console.log("📩 Response JSON:", res.data);
+
+    setIsLoggedIn(true);
+  } catch (err) {
+    console.error("❌ Error:", err);
+    setError(
+      err.response?.data?.message || "Login failed. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      {/* Navbar */}
       <Navbar />
 
-      {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-5xl mb-8">
@@ -43,9 +69,7 @@ const LandingPage = ({ setIsLoggedIn }) => {
               key={idx}
               className="p-4 bg-transparent dark:bg-[#10101041] rounded-xl shadow-sm text-center"
             >
-              <p
-                className={`text-2xl sm:text-3xl font-bold ${stat.color}`}
-              >
+              <p className={`text-2xl sm:text-3xl font-bold ${stat.color}`}>
                 {stat.value}
               </p>
               <p className="mt-1 text-gray-700 dark:text-gray-300 text-sm sm:text-base">
@@ -65,44 +89,46 @@ const LandingPage = ({ setIsLoggedIn }) => {
           <span className="italic">The exclusive student social platform</span>
         </p>
 
-        {/* Join Community Form */} 
+        {/* Join Community Form */}
         <div className="bg-transparent dark:bg-[#10101041] p-4 sm:p-4 rounded-xl shadow-2xs w-full max-w-md text-center">
           <h2 className="text-lg sm:text-xl font-semibold mb-4">
             Join the Community
           </h2>
+
+          {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+
           <input
             type="text"
             placeholder="Your nickname or username"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 rounded-lg bg-transparent dark:bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
+            className="w-full p-3 rounded-lg bg-transparent border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
           />
           <input
-            type="text"
+            type="email"
             placeholder="Your email here"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 rounded-lg  bg-transparent dark:bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
+            className="w-full p-3 rounded-lg bg-transparent border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
           />
           <input
-            type="text"
+            type="password"
             placeholder="Your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-lg  bg-transparent dark:bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
+            className="w-full p-3 rounded-lg bg-transparent border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:outline-none mb-4 text-sm sm:text-base"
           />
           <button
             onClick={handleEnter}
-            className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors text-sm sm:text-base"
+            disabled={loading}
+            className="w-full px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold transition-colors text-sm sm:text-base"
           >
-            Enter SPITverse
+            {loading ? "Logging in..." : "Enter SPITverse"}
           </button>
         </div>
-
       </div>
     </div>
   );
 };
 
 export default LandingPage;
-
