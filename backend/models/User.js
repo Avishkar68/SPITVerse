@@ -10,6 +10,7 @@ const SocialSchema = new Schema({
 }, { _id: false });
 
 const UserSchema = new Schema({
+  name: {type: String, required: true},
   email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
   name: { type: String, default: '' },
