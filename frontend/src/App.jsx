@@ -24,7 +24,7 @@ function App() {
             element={isAuthenticated() ? <Feed /> : <Navigate to="/" />}
           />
           <Route
-            path="/profile"
+            path="/profile/:id"
             element={isAuthenticated() ? <Profile /> : <Navigate to="/" />}
           />
         </Route>
