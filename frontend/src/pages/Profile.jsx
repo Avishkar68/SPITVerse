@@ -1,198 +1,145 @@
-// import React from 'react'
-// const Profile = () => {
-//   const res = localStorage.getItem("data")
-//   const data = res ? JSON.parse(res) : null
-//   const userData = data.user
-//   console.log(userData);
-
-//   return (
-//     <div className='w-screen h-fit flex items-center justify-center pt-6 bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-gray-100 transition-colors duration-300'>
-//       <div className='md:w-[900px] min-h-[600px] flex flex-col md:flex-row'>
-//         <div className='w-fit md:w-[500px] m-2'>
-//           <div className='p-6 shadow-sm dark:shadow-[#ffffff26] rounded-xl h-fit'>
-//             <div className='w-full h-fit  flex flex-col justify-center items-center'>
-//               <div className='w-[90px] h-[90px] rounded-full flex items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500'>
-//                 <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-//               </div>
-//               <div className='text-3xl font-semibold mt-2'>{userData.name}</div>
-//               <div className='text-sm text-black dark:text-[#ffffff69]'>Member since <span>{userData?.createdAt
-//                 ? new Date(userData.createdAt).toLocaleString("en-IN", {
-//                   timeZone: "Asia/Kolkata",
-//                   day: "2-digit",
-//                   month: "long",
-//                   year: "numeric",
-
-//                 })
-//                 : "N/A"}</span></div>
-//             </div>
-//             <div>
-//               <p className='text-xl font-semibold mt-2'>Social Links</p>
-//               <div className='text-md mt-4'>
-//                 {userData.linkedinId ? <a href={userData.linkedinId} className='flex items-center underline'>LinkedIn <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg></a> : <p>Not added yet</p>}
-//               </div>
-//               <div className='text-md mt-4'>
-//                 {userData.github ? <a href={userData.github} className='flex items-center underline'>Github <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg></a> : <p>Not added yet</p>}
-//               </div>
-//               <div className='text-md mt-4'>
-//                 <div></div>
-//                 {userData.insta ? <a href={userData.insta} className='flex items-center underline'>Instagram <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right-icon lucide-arrow-up-right"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg></a> : <p>Not added yet</p>}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//         <div className='w-fit md:w-full h-fit '>
-//           <div className='   m-2 mb-6 p-6 shadow-sm dark:shadow-[#ffffff26] rounded-xl'>
-//             <div className='text-xl font-semibold mt-2'>About me</div>
-//             {userData.description ? <div>{userData.description}</div> : <p>Bio not added yet!</p>}
-//           </div>
-//           <div className='   m-2 mb-6 p-6 shadow-sm dark:shadow-[#ffffff26] rounded-xl'>
-//             <div className='text-xl font-semibold mt-2'>Skills & Technologies</div>
-//             {userData.skills ? <div>{userData.skills}</div> : <p>No skills added yet!</p>}
-//           </div>
-//           <div className='   m-2 p-6 mb-6 shadow-sm dark:shadow-[#ffffff26] rounded-xl'>
-//             <div className='text-xl font-semibold mt-2'>Activity stats</div>
-//             <div className='w-full flex justify-center items-center  gap-20 '>
-//               <div className='my-4 flex flex-col items-center justify-center '>
-//                 <p className='text-3xl font-semibold text-[#1F5A96]'>{userData.postsCount}</p>
-//                 <p>Posts</p>
-//               </div>
-//               <div className='my-4 flex flex-col items-center justify-center '>
-//                 <p className='text-3xl font-semibold text-[#17914B]'>{userData.projectsCount}</p>
-//                 <p>Projects</p>
-//               </div>
-//               <div className='my-4 flex flex-col items-center justify-center '>
-//                 <p className='text-3xl font-semibold text-[#BB4DCD]'>{userData.streak}</p>
-//                 <p>Streak</p>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default Profile
-
 import React from 'react'
 import { useParams } from 'react-router-dom'
+import { User, Linkedin, Github, Instagram } from 'lucide-react'; 
 
 const Profile = () => {
-  const { id } = useParams();  // ✅ grab user id from URL
+  const { id } = useParams();
   const res = localStorage.getItem("data");
   const data = res ? JSON.parse(res) : null;
-  const users = data?.appData?.users || []; // where all users are stored
+  const users = data?.appData?.users || [];
 
-  // ✅ find the correct user
+  // Find the correct user from local data (optimistic client-side render)
   const userData = users.find((u) => u._id === id);
 
   if (!userData) {
-    return <div className="p-6">User not found</div>;
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-gray-50 dark:bg-[#121212] text-gray-900 dark:text-gray-100 p-6 text-xl">
+        User not found.
+      </div>
+    );
   }
 
+  const cardClasses = 'bg-white dark:bg-[#1A1A1A] p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 transition-shadow duration-300';
+  const headerClasses = 'text-xl font-bold mb-4 border-b pb-2 border-gray-100 dark:border-gray-800 text-indigo-600 dark:text-indigo-400';
+  
+  const memberSinceDate = userData?.createdAt
+    ? new Date(userData.createdAt).toLocaleDateString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "N/A";
+
+  const skillsArray = userData.skills 
+    ? userData.skills.split(',').map(s => s.trim()).filter(s => s !== "") 
+    : [];
+
   return (
-    <div className='w-screen h-fit flex items-center justify-center pt-6 bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-gray-100 transition-colors duration-300'>
-      <div className='md:w-[900px] min-h-[600px] flex flex-col md:flex-row'>
-        {/* left section */}
-        <div className='w-fit md:w-[500px] m-2'>
-          <div className='p-6 shadow-sm dark:shadow-[#ffffff26] rounded-xl h-fit'>
-            <div className='w-full flex flex-col justify-center items-center'>
-              {/* Avatar */}
-              <div className='w-[90px] h-[90px] rounded-full flex items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500'>
-                <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="white" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
+    <div className='min-h-screen flex items-start justify-center pt-10 pb-10 bg-gray-50 dark:bg-[#121212] text-gray-900 dark:text-gray-100 font-sans'>
+      {/* Centered Main Container */}
+      <div className='w-full max-w-6xl px-4 flex flex-col lg:flex-row gap-6'>
+        
+        {/* Left Column (Profile Info) */}
+        <div className='lg:w-1/3 shrink-0 space-y-6'>
+          <div className={`${cardClasses} lg:sticky lg:top-10`}> 
+            {/* Avatar & Name */}
+            <div className='w-full flex flex-col justify-center items-center text-center'>
+              <div className='w-[100px] h-[100px] rounded-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-xl mb-4'>
+                <User size={50} color="white" strokeWidth={1.5} />
               </div>
-              {/* Name + join date */}
-              <div className='text-3xl font-semibold mt-2'>{userData.name}</div>
-              <div className='text-sm text-black dark:text-[#ffffff69]'>
-                Member since{" "}
-                <span>
-                  {userData?.createdAt
-                    ? new Date(userData.createdAt).toLocaleString("en-IN", {
-                        timeZone: "Asia/Kolkata",
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : "N/A"}
-                </span>
+              <div className='text-3xl font-extrabold'>{userData.name}</div>
+              <div className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
+                Member since <span>{memberSinceDate}</span>
               </div>
+              <div className='text-md font-medium text-indigo-600 dark:text-indigo-400 mt-2'>{userData.email}</div>
             </div>
 
-            {/* Social links */}
-            <div>
-              <p className='text-xl font-semibold mt-2'>Social Links</p>
-              <div className='text-md mt-4'>
-                {userData.linkedinId ? (
-                  <a href={userData.linkedinId} className='flex items-center underline' target="_blank" rel="noreferrer">
-                    LinkedIn ↗
-                  </a>
-                ) : (
-                  <p>Not added yet</p>
-                )}
-              </div>
-              <div className='text-md mt-4'>
-                {userData.github ? (
-                  <a href={userData.github} className='flex items-center underline' target="_blank" rel="noreferrer">
-                    Github ↗
-                  </a>
-                ) : (
-                  <p>Not added yet</p>
-                )}
-              </div>
-              <div className='text-md mt-4'>
-                {userData.insta ? (
-                  <a href={userData.insta} className='flex items-center underline' target="_blank" rel="noreferrer">
-                    Instagram ↗
-                  </a>
-                ) : (
-                  <p>Not added yet</p>
-                )}
+            {/* Social Links */}
+            <div className='mt-6 border-t pt-4 border-gray-100 dark:border-gray-800'>
+              <p className='text-lg font-semibold mb-3'>Connect</p>
+              <div className='space-y-3'>
+                {
+                  [
+                    { id: userData.linkedinId, name: 'LinkedIn', Icon: Linkedin, color: 'text-blue-600' },
+                    { id: userData.github, name: 'Github', Icon: Github, color: 'text-gray-800 dark:text-gray-200' },
+                    { id: userData.insta, name: 'Instagram', Icon: Instagram, color: 'text-pink-500' },
+                  ].map(({ id: linkId, name, Icon, color }) => (
+                    <div key={name} className='flex items-center justify-between'>
+                        <div className='flex items-center space-x-2'>
+                            <Icon size={20} className={color} />
+                            <span className='font-medium'>{name}</span>
+                        </div>
+                        {linkId ? (
+                            <a href={linkId} className={`text-sm underline hover:opacity-80 transition-opacity ${color}`} target="_blank" rel="noreferrer">
+                                View Profile ↗
+                            </a>
+                        ) : (
+                            <p className='text-sm text-gray-400 dark:text-gray-600 italic'>Not added</p>
+                        )}
+                    </div>
+                  ))
+                }
               </div>
             </div>
           </div>
         </div>
 
-        {/* right section */}
-        <div className='w-fit md:w-full h-fit'>
-          {/* About me */}
-          <div className='m-2 mb-6 p-6 shadow-sm dark:shadow-[#ffffff26] rounded-xl'>
-            <div className='text-xl font-semibold mt-2'>About me</div>
-            {userData.description ? <div>{userData.description}</div> : <p>Bio not added yet!</p>}
-          </div>
-
-          {/* Skills */}
-          <div className='m-2 mb-6 p-6 shadow-sm dark:shadow-[#ffffff26] rounded-xl'>
-            <div className='text-xl font-semibold mt-2'>Skills & Technologies</div>
-            {userData.skills ? <div>{userData.skills}</div> : <p>No skills added yet!</p>}
-          </div>
-
-          {/* Activity stats */}
-          <div className='m-2 p-6 mb-6 shadow-sm dark:shadow-[#ffffff26] rounded-xl'>
-            <div className='text-xl font-semibold mt-2'>Activity stats</div>
-            <div className='w-full flex justify-center items-center gap-20'>
-              <div className='my-4 flex flex-col items-center justify-center'>
-                <p className='text-3xl font-semibold text-[#1F5A96]'>{userData.postsCount}</p>
-                <p>Posts</p>
-              </div>
-              <div className='my-4 flex flex-col items-center justify-center'>
-                <p className='text-3xl font-semibold text-[#17914B]'>{userData.projectsCount}</p>
-                <p>Projects</p>
-              </div>
-              <div className='my-4 flex flex-col items-center justify-center'>
-                <p className='text-3xl font-semibold text-[#BB4DCD]'>{userData.streak}</p>
-                <p>Streak</p>
-              </div>
+        {/* Right Column (Details) */}
+        <div className='lg:w-2/3 space-y-6'>
+          
+          {/* Activity Stats */}
+          <div className={`${cardClasses} p-6`}>
+            <div className={headerClasses}>Activity Summary</div>
+            <div className='grid grid-cols-3 gap-4 text-center'>
+              {
+                [
+                  { count: userData.postsCount || 0, label: 'Posts', color: 'text-indigo-600 dark:text-indigo-400' },
+                  { count: userData.projectsCount || 0, label: 'Projects', color: 'text-green-600 dark:text-green-400' },
+                  { count: userData.streak || 0, label: 'Streak', color: 'text-pink-600 dark:text-pink-400' },
+                ].map((stat) => (
+                  <div key={stat.label} className={`py-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 shadow-sm`}>
+                    <p className={`text-4xl font-extrabold ${stat.color}`}>{stat.count}</p>
+                    <p className='mt-1 text-sm text-gray-600 dark:text-gray-300'>{stat.label}</p>
+                  </div>
+                ))
+              }
             </div>
           </div>
 
+          {/* About me */}
+          <div className={cardClasses}>
+            <div className={headerClasses}>About Me</div>
+            {userData.description ? <div className='whitespace-pre-line text-gray-700 dark:text-gray-300'>{userData.description}</div> : <p className='text-gray-500 dark:text-gray-400 italic'>Bio not added yet. Say something about yourself!</p>}
+          </div>
+
+          {/* Skills */}
+          <div className={cardClasses}>
+            <div className={headerClasses}>Skills & Technologies</div>
+            {skillsArray.length > 0 ? (
+              <div className='flex flex-wrap gap-2'>
+                {skillsArray.map((skill, index) => (
+                  <span 
+                    key={index} 
+                    className='px-3 py-1 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-sm font-medium rounded-full'
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className='text-gray-500 dark:text-gray-400 italic'>No skills added yet! Add some to collaborate better.</p>
+            )}
+          </div>
           
+          <div className={cardClasses}>
+             <div className={headerClasses}>Recent Activity</div>
+             <p className='text-gray-500 dark:text-gray-400 italic'>Future section for the user's latest posts or comments.</p>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default Profile
+export default Profile;

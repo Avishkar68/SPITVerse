@@ -1,7 +1,7 @@
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 import { computeUpdatedStreak } from '../utils/streak.js';
-
+import mongoose from 'mongoose';
 // Create a post (any type). Requires authorEmail and type
 const createPost = async (req, res) => {
   try {
@@ -116,9 +116,11 @@ const addComment = async (req, res) => {
 const votePoll = async (req, res) => {
   try {
     const { postId } = req.params;
-    const { optionIndex } = req.body;
-    if (optionIndex === undefined) {
-      return res.status(400).json({ message: 'optionIndex required' });
+    // 💡 NEW: Accept userId from the request body
+    const { optionIndex, userId } = req.body; 
+
+    if (optionIndex === undefined || !userId) { // Ensure userId is provided
+      return res.status(400).json({ message: 'optionIndex and userId required' });
     }
 
     const post = await Post.findById(postId);
@@ -129,12 +131,27 @@ const votePoll = async (req, res) => {
       return res.status(400).json({ message: 'Invalid option index' });
     }
 
+    // --- 💡 CRITICAL LOGIC: Check if user has already voted ---
+    const userAlreadyVoted = post.pollOptions.some(option => 
+      option.voters.includes(userId)
+    );
+
+    if (userAlreadyVoted) {
+      return res.status(403).json({ message: 'You have already voted on this poll.' });
+    }
+    // --- END CRITICAL LOGIC ---
+
+    // 1. Increment the vote count
     post.pollOptions[optionIndex].votes =
       (post.pollOptions[optionIndex].votes || 0) + 1;
+      
+    // 2. 💡 NEW: Add user ID to the voters array for the selected option
+    post.pollOptions[optionIndex].voters.push(userId); 
+
     post.updatedAt = new Date();
     await post.save();
 
-    return res.json({ message: 'Voted', pollOptions: post.pollOptions });
+    return res.json({ message: 'Voted successfully', pollOptions: post.pollOptions });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: 'Server error' });
@@ -168,4 +185,47 @@ const closeProject = async (req, res) => {
   }
 };
 
-export { createPost, getPosts, addComment, votePoll, closeProject };
+const toggleLike = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req.body; // Requires the user's ID to toggle the like
+
+    if (!userId) {
+      return res.status(400).json({ message: 'userId required' });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    const userIdObjectId = new mongoose.Types.ObjectId(userId); // Ensure it's ObjectId for comparison
+
+    const userIndex = post.likes.findIndex(
+      (id) => id.equals(userIdObjectId)
+    );
+
+    let message;
+    let newLikesCount;
+    
+    if (userIndex === -1) {
+      // User has not liked it -> Add like
+      post.likes.push(userIdObjectId);
+      message = 'Post liked';
+    } else {
+      // User has liked it -> Remove like (unlike)
+      post.likes.splice(userIndex, 1);
+      message = 'Post unliked';
+    }
+    
+    post.updatedAt = new Date();
+    await post.save();
+    
+    newLikesCount = post.likes.length;
+
+    return res.json({ message, likesCount: newLikesCount, isLiked: userIndex === -1 });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export { createPost, getPosts, addComment, votePoll, closeProject , toggleLike };
