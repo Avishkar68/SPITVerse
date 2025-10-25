@@ -92,10 +92,29 @@ const getFullDB = async (req, res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 };
+const getTopRankers = async (req, res) => {
+  try {
+    const topRankers = await User.find({})
+      .sort({ streak: -1, postsCount: -1 }) // Sort by streak descending, then postsCount descending
+      .limit(5)
+      .select('name email streak postsCount') // Select only necessary fields
+      .lean();
+    
+    return res.json(topRankers);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error fetching rankers' });
+  }
+};
+
+
 
 export default {
   getProfile,
   updateProfile,
   getAggregateDashboard,
-  getFullDB
+  getFullDB,
+  getTopRankers // Export the new function
 };
+
+
