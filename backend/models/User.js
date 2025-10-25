@@ -10,14 +10,19 @@ const SocialSchema = new Schema({
 }, { _id: false });
 
 const UserSchema = new Schema({
+  // FIX: Retaining the first 'name' field and removing the duplicate
   name: {type: String, required: true},
   email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
-  name: { type: String, default: '' },
+  
   linkedinId: { type: String, default: '' },
   insta: { type: String, default: '' },
   github: { type: String, default: '' },
   description: { type: String, default: '' },
+  
+  // NEW: Field for Skills (comma-separated string)
+  skills: { type: String, default: '' }, 
+  
   socials: { type: SocialSchema, default: () => ({}) },
 
   // activity metadata

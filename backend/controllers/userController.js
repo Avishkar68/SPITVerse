@@ -29,10 +29,22 @@ const updateProfile = async (req, res) => {
     if (!id && !email) return res.status(400).json({ message: 'Provide id or email to update' });
 
     const filter = id ? { _id: id } : { email };
-    const allowedFields = ['name','linkedinId','insta','github','description','socials'];
+    
+    // 💡 UPDATED: Included 'skills' in the allowed fields list
+    const allowedFields = [
+      'name',
+      'linkedinId',
+      'insta',
+      'github',
+      'description',
+      'socials',
+      'skills' // New field added to the schema
+    ];
+    
     const sanitized = {};
     for (const k of allowedFields) if (update[k] !== undefined) sanitized[k] = update[k];
 
+    
     const user = await User.findOneAndUpdate(filter, { $set: sanitized }, { new: true }).lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
     delete user.passwordHash;

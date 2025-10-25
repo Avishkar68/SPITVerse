@@ -3,15 +3,17 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { FaUser } from "react-icons/fa";
+import { MdOutlineLightMode, MdOutlineDarkMode } from "react-icons/md";
 
-// --- Utility Functions (Provided by User) ---
+// --- Utility Functions ---
 
 // utils/auth.js equivalent
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-// --- Simplified and Professional Input Component (Provided by User) ---
+// --- Simplified and Professional Input Component ---
 
 const Input = React.forwardRef(({ className, type, ...props }, ref) => {
   return (
@@ -61,7 +63,6 @@ function ModalWrapper({ children, onClose }) {
 // ---------------------------------------------
 
 function TypeSelectionModal({ handleTypeSelection, setShowTypeSelectionModal }) {
-    // This component is stateless and relies only on stable props, so it won't cause focus loss.
     return (
         <ModalWrapper onClose={() => setShowTypeSelectionModal(false)}>
             <h2 className="text-2xl font-bold mb-6 text-indigo-600 dark:text-indigo-400 text-center">
@@ -104,7 +105,6 @@ function PostCreationModal({
     setProjectContact,
     setShowModal
 }) {
-    // Uses the imported Input component directly
     return (
         <ModalWrapper onClose={() => setShowModal(false)}>
             <h2 className="text-2xl font-bold mb-5 text-indigo-600 dark:text-indigo-400">
@@ -359,7 +359,7 @@ const PostItem = React.memo(function PostItem({
                         onClick={() => handleInteractionListToggle(post._id, false)}
                     >
                         <i className={`fa-${openInteractionId === post._id ? 'solid' : 'regular'} fa-comment`}></i>
-                        <span className="text-sm font-medium cursor-pointer">Comments {interactionList.length || 0})</span>
+                        <span className="text-sm font-medium cursor-pointer">Comments ({interactionList.length || 0})</span>
                     </button>
                 )}
 
@@ -452,6 +452,44 @@ const PostItem = React.memo(function PostItem({
     );
 });
 
+// ---------------------------------------------
+// --- New Component: PostSkeleton ---
+// ---------------------------------------------
+
+function PostSkeleton() {
+    return (
+        <div 
+            className="bg-white dark:bg-[#1A1A1A] shadow-lg rounded-xl p-5 border border-gray-100 dark:border-gray-800 animate-pulse"
+        >
+            {/* Author Header Skeleton */}
+            <div className="flex items-center mb-4">
+                <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 mr-3 shrink-0"></div>
+                <div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-32 mb-1"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-24"></div>
+                </div>
+                <div className="ml-auto w-16 h-6 bg-gray-200 dark:bg-gray-800 rounded"></div>
+            </div>
+
+            {/* Title Line Skeleton */}
+            <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-4"></div>
+            
+            {/* Content Lines Skeleton */}
+            <div className="space-y-2 mb-4">
+                <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-11/12"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-10/12"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+            </div>
+            
+            {/* Footer Action Icons Skeleton */}
+            <div className="flex justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/5"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/5"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/5"></div>
+            </div>
+        </div>
+    );
+}
 
 // ---------------------------------------------
 // --- Main Component: Feed (State Management) ---
@@ -481,6 +519,9 @@ const Feed = () => {
     const [projectContact, setProjectContact] = useState("");
 
     const [feedFilter, setFeedFilter] = useState('all'); // 'all', 'project', 'blog', 'poll'
+    
+    // ADDED: Loading state for data fetching
+    const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -494,6 +535,7 @@ const Feed = () => {
     const data = getAuthData();
     const loggedInUserEmail = data?.user?.email;
     const loggedInUserId = data?.user?._id;
+    const loggedInUserName = data?.user?.name || 'Profile';
 
     // --- Data Loading & Refresh ---
     
@@ -583,6 +625,8 @@ const Feed = () => {
     const refreshDashboardData = useCallback(async (type = 'all') => {
         if (!loggedInUserId) return; 
 
+        setLoading(true); // <--- START LOADING
+
         try {
             let apiEndpoint = "http://localhost:4000/api/users/dashboard/full";
             if (type !== 'all') {
@@ -619,6 +663,8 @@ const Feed = () => {
         } catch (err) {
             console.error(`Failed to refresh dashboard data for type ${type}:`, err);
             loadFilteredData(type); 
+        } finally {
+            setLoading(false); // <--- STOP LOADING
         }
     }, [loggedInUserId, loadInitialData, loadFilteredData]); 
 
@@ -897,6 +943,15 @@ const Feed = () => {
         navigate(`/profile/${author._id}`);
     }, [navigate]);
 
+    // NEW HANDLER: For navigation to self profile from sidebar
+    const handleSelfProfileClick = useCallback(() => {
+        if (loggedInUserId) {
+            navigate(`/profile/${loggedInUserId}`);
+        } else {
+            alert("Please log in to view your profile.");
+        }
+    }, [loggedInUserId, navigate]);
+
 
     // --- Helper Data (Memoized) ---
     // This is now stable as both posts and users states are explicitly updated 
@@ -931,7 +986,7 @@ const Feed = () => {
 
                 {/* 1. Fixed Left Sidebar */}
                 <div className="hidden lg:block w-64 xl:w-72 h-[100vh-66px] border-r border-gray-900 dark:border-gray-800 p-4 shrink-0 overflow-y-auto bg-white dark:bg-[#1A1A1A]">
-                    {/* <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6">CollegeHub</h1> */}
+                    <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6">CollegeHub</h1>
                     <div className="space-y-2">
                         {navLinks.map(({ type, label, icon }) => (
                             <div 
@@ -949,13 +1004,25 @@ const Feed = () => {
                         ))}
                     </div>
                     
-                    <button
-                        onClick={() => setDarkMode(p => !p)}
-                        className="mt-8 w-full flex items-center justify-center space-x-2 p-2 rounded-full bg-gray-200/50 dark:bg-gray-800/70 text-sm hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200"
-                    >
-                        <i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
-                        <span>{darkMode ? 'Switch to Light' : 'Switch to Dark'}</span>
-                    </button>
+                    {/* UPDATED: Profile Button & Dark Mode Toggle */}
+                    <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4">
+                        <button
+                            onClick={handleSelfProfileClick}
+                            className="w-full flex items-center cursor-pointer justify-start space-x-3 p-2 rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-colors duration-200 font-medium"
+                        >
+                            <FaUser />
+                            <span className="truncate">{loggedInUserName}</span>
+                        </button>
+
+                        <button
+                            onClick={() => setDarkMode(p => !p)}
+                            className="w-full flex items-center justify-center space-x-2 p-2 rounded-full bg-gray-200/50 dark:bg-gray-800/70 text-sm hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200"
+                        >
+                            {darkMode ? <MdOutlineLightMode/> : <MdOutlineDarkMode/>}
+                            <span>{darkMode ? 'Switch to Light' : 'Switch to Dark'}</span>
+                        </button>
+                    </div>
+
                 </div>
 
                 {/* 2. Scrollable Center Feed */}
@@ -986,34 +1053,42 @@ const Feed = () => {
 
                         {/* Posts Feed */}
                         <div className="space-y-6">
-                            {postsWithAuthors.length === 0 && (
+                            {loading ? (
+                                // RENDER SKELETONS WHEN LOADING
+                                <>
+                                    <PostSkeleton />
+                                    <PostSkeleton />
+                                    <PostSkeleton />
+                                </>
+                            ) : postsWithAuthors.length === 0 ? (
                                 <div className="text-center py-10 text-gray-500 dark:text-gray-400">
                                     No {feedFilter !== 'all' ? `${feedFilter} ` : ''}posts yet. Be the first to post!
                                 </div>
+                            ) : (
+                                postsWithAuthors.map((post) => (
+                                    <PostItem
+                                        key={post._id}
+                                        post={post}
+                                        currentLikes={postLikes[post._id] !== undefined ? postLikes[post._id] : post.likes}
+                                        isLiked={userLikes.has(post._id)}
+                                        loggedInUserEmail={loggedInUserEmail}
+                                        users={users}
+                                        openInteractionId={openInteractionId}
+                                        commentText={commentText}
+                                        showAllUsersId={showAllUsersId}
+                                        // Stable Handlers
+                                        handleLikeToggle={handleLikeToggle}
+                                        handleInteractionListToggle={handleInteractionListToggle}
+                                        handleInteractionSubmission={handleInteractionSubmission}
+                                        handlePostAction={handlePostAction}
+                                        setSelectedAuthor={setSelectedAuthor}
+                                        handleVote={handleVote}
+                                        // State Setters (stable)
+                                        setCommentText={setCommentText}
+                                        setShowAllUsersId={setShowAllUsersId}
+                                    />
+                                ))
                             )}
-                            {postsWithAuthors.map((post) => (
-                                <PostItem
-                                    key={post._id}
-                                    post={post}
-                                    currentLikes={postLikes[post._id] !== undefined ? postLikes[post._id] : post.likes}
-                                    isLiked={userLikes.has(post._id)}
-                                    loggedInUserEmail={loggedInUserEmail}
-                                    users={users}
-                                    openInteractionId={openInteractionId}
-                                    commentText={commentText}
-                                    showAllUsersId={showAllUsersId}
-                                    // Stable Handlers
-                                    handleLikeToggle={handleLikeToggle}
-                                    handleInteractionListToggle={handleInteractionListToggle}
-                                    handleInteractionSubmission={handleInteractionSubmission}
-                                    handlePostAction={handlePostAction}
-                                    setSelectedAuthor={setSelectedAuthor}
-                                    handleVote={handleVote}
-                                    // State Setters (stable)
-                                    setCommentText={setCommentText}
-                                    setShowAllUsersId={setShowAllUsersId}
-                                />
-                            ))}
                         </div>
                     </div>
                 </div>
@@ -1052,13 +1127,29 @@ const Feed = () => {
                         <div className="sticky top-4 bg-white dark:bg-[#1A1A1A] p-4 rounded-xl shadow-md border border-gray-100 dark:border-gray-800">
                             <h3 className="font-bold mb-4 text-lg text-indigo-600 dark:text-indigo-400">🔥 Top 5 Rankers</h3>
                             <div className="space-y-4">
-                                {topRankers.length === 0 ? (
+                                {/* RANKERS SKELETON: Show simple loading state for rankers */}
+                                {loading ? (
+                                    Array(5).fill(0).map((_, index) => (
+                                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg animate-pulse">
+                                            <div className="flex items-center space-x-3">
+                                                <div className="text-xl font-extrabold w-6 shrink-0 text-center text-gray-300 dark:text-gray-700">#</div>
+                                                <div className="flex flex-col leading-tight space-y-1">
+                                                    <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-20"></div>
+                                                    <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-24"></div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right shrink-0 space-y-1">
+                                                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
+                                                <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-10"></div>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : topRankers.length === 0 ? (
                                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">No rankers found.</p>
                                 ) : (
                                     topRankers.map((user, index) => (
                                         <div 
                                             key={user._id} 
-                                            // ADDED: onClick handler to select the author (user)
                                             onClick={() => setSelectedAuthor(user)}
                                             className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/70 transition-colors"
                                         >
