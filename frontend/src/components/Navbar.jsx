@@ -37,7 +37,7 @@ const Navbar = () => {
                     bg-white/50 dark:bg-[#1A1A1A]/80 
                     backdrop-blur-md 
                     border-b border-gray-200/50 dark:border-gray-700/50
-                    shadow-lg dark:shadow-none transition-colors duration-300"
+                    transition-colors duration-300"
     >
       
       <Link

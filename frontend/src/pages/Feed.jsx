@@ -5,6 +5,9 @@ import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { FaUser } from "react-icons/fa";
 import { MdOutlineLightMode, MdOutlineDarkMode } from "react-icons/md";
+import { AiOutlineLike } from "react-icons/ai";
+import { BiCommentDetail } from "react-icons/bi";
+
 
 // --- Utility Functions ---
 
@@ -320,7 +323,7 @@ const PostItem = React.memo(function PostItem({
                     onClick={() => handleLikeToggle(post._id)}
                 >
                     <i className={`${isLiked ? 'fas' : 'far'} fa-heart`}></i>
-                    <span className="text-sm font-medium">Like {currentLikes}</span>
+                    <span className="text-sm font-medium"><AiOutlineLike  className="text-xl"/> {currentLikes}</span>
                 </button>
 
                 {/* INTERACTION FEATURE */}
@@ -359,7 +362,8 @@ const PostItem = React.memo(function PostItem({
                         onClick={() => handleInteractionListToggle(post._id, false)}
                     >
                         <i className={`fa-${openInteractionId === post._id ? 'solid' : 'regular'} fa-comment`}></i>
-                        <span className="text-sm font-medium cursor-pointer">Comments ({interactionList.length || 0})</span>
+                        <span className="text-sm font-medium cursor-pointer"><BiCommentDetail />
+ ({interactionList.length || 0})</span>
                     </button>
                 )}
 
@@ -982,231 +986,222 @@ const Feed = () => {
 
     return (
         <div className={`${darkMode ? "dark" : ""} font-sans`}>
-            <div className="flex h-screen w-screen overflow-hidden bg-gray-50 dark:bg-[#121212] dark:text-gray-100">
+  <div className="flex h-screen w-[1517px] overflow-hidden bg-gray-50 text-gray-900 dark:bg-[#121212] dark:text-gray-100 transition-colors duration-300">
 
-                {/* 1. Fixed Left Sidebar */}
-                <div className="hidden lg:block w-64 xl:w-72 h-[100vh-66px] border-r border-gray-900 dark:border-gray-800 p-4 shrink-0 overflow-y-auto bg-white dark:bg-[#1A1A1A]">
-                    <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-6">CollegeHub</h1>
-                    <div className="space-y-2">
-                        {navLinks.map(({ type, label, icon }) => (
-                            <div 
-                                key={type}
-                                onClick={() => handleFeedFilterChange(type)}
-                                className={cn(
-                                    "flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors duration-150 font-semibold",
-                                    feedFilter === type
-                                        ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-gray-800"
-                                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                                )}
-                            >
-                                <i className={icon}></i> <span>{label}</span>
-                            </div>
-                        ))}
-                    </div>
-                    
-                    {/* UPDATED: Profile Button & Dark Mode Toggle */}
-                    <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-4">
-                        <button
-                            onClick={handleSelfProfileClick}
-                            className="w-full flex items-center cursor-pointer justify-start space-x-3 p-2 rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-colors duration-200 font-medium"
-                        >
-                            <FaUser />
-                            <span className="truncate">{loggedInUserName}</span>
-                        </button>
+    {/* 1. Fixed Left Sidebar */}
+    <div className="hidden lg:block w-64 xl:w-72 h-screen border-r border-gray-200 dark:border-gray-800 p-4 shrink-0 overflow-y-auto bg-white dark:bg-[#1A1A1A] shadow-sm dark:shadow-none transition-colors duration-300">
+      <div className="space-y-2">
+        {navLinks.map(({ type, label, icon }) => (
+          <div
+            key={type}
+            onClick={() => handleFeedFilterChange(type)}
+            className={cn(
+              "flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-200 font-semibold",
+              feedFilter === type
+                ? "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-gray-800 shadow-sm"
+                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/60"
+            )}
+          >
+            <i className={icon}></i> <span>{label}</span>
+          </div>
+        ))}
+      </div>
 
-                        <button
-                            onClick={() => setDarkMode(p => !p)}
-                            className="w-full flex items-center justify-center space-x-2 p-2 rounded-full bg-gray-200/50 dark:bg-gray-800/70 text-sm hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors duration-200"
-                        >
-                            {darkMode ? <MdOutlineLightMode/> : <MdOutlineDarkMode/>}
-                            <span>{darkMode ? 'Switch to Light' : 'Switch to Dark'}</span>
-                        </button>
-                    </div>
+      {/* Profile + Dark Mode Toggle */}
+      <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+        <button
+          onClick={handleSelfProfileClick}
+          className="w-full flex items-center cursor-pointer justify-start space-x-3 p-2 rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-colors duration-200 font-medium"
+        >
+          <FaUser />
+          <span className="truncate">{loggedInUserName}</span>
+        </button>
 
-                </div>
+        
+      </div>
+    </div>
 
-                {/* 2. Scrollable Center Feed */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-6">
-                    <div className="max-w-xl mx-auto">
-                        {/* Current Filter Title */}
-                        <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 capitalize">
-                            {feedFilter === 'all' ? 'Feed' : `${feedFilter} Posts`}
-                        </h2>
-                        
-                        {/* Create Post Area */}
-                        <div className="relative mb-6 bg-white dark:bg-[#1A1A1A] p-4 rounded-xl shadow-md border border-gray-100 dark:border-gray-800">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-indigo-400 dark:bg-indigo-600 mr-3 flex items-center justify-center text-white text-lg font-semibold shrink-0">
-                                        {loggedInUserEmail?.charAt(0).toUpperCase() || "U"}
-                                    </div>
-                                    <span className="text-gray-600 dark:text-gray-300">What's on your mind?</span>
-                                </div>
-                                <button
-                                    onClick={() => handlePostAction('Create')}
-                                    className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-full shadow-lg hover:bg-indigo-700 transition-colors duration-200 text-sm font-medium"
-                                >
-                                    Create Post
-                                </button>
-                            </div>
-                        </div>
+    {/* 2. Center Feed */}
+    {/* <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-[#121212] transition-colors duration-300"> */}
+      <div className="flex-1 overflow-y-scroll scrollbar-hide p-4 md:p-6 bg-gray-50 dark:bg-[#121212] transition-colors duration-300">
 
-                        {/* Posts Feed */}
-                        <div className="space-y-6">
-                            {loading ? (
-                                // RENDER SKELETONS WHEN LOADING
-                                <>
-                                    <PostSkeleton />
-                                    <PostSkeleton />
-                                    <PostSkeleton />
-                                </>
-                            ) : postsWithAuthors.length === 0 ? (
-                                <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-                                    No {feedFilter !== 'all' ? `${feedFilter} ` : ''}posts yet. Be the first to post!
-                                </div>
-                            ) : (
-                                postsWithAuthors.map((post) => (
-                                    <PostItem
-                                        key={post._id}
-                                        post={post}
-                                        currentLikes={postLikes[post._id] !== undefined ? postLikes[post._id] : post.likes}
-                                        isLiked={userLikes.has(post._id)}
-                                        loggedInUserEmail={loggedInUserEmail}
-                                        users={users}
-                                        openInteractionId={openInteractionId}
-                                        commentText={commentText}
-                                        showAllUsersId={showAllUsersId}
-                                        // Stable Handlers
-                                        handleLikeToggle={handleLikeToggle}
-                                        handleInteractionListToggle={handleInteractionListToggle}
-                                        handleInteractionSubmission={handleInteractionSubmission}
-                                        handlePostAction={handlePostAction}
-                                        setSelectedAuthor={setSelectedAuthor}
-                                        handleVote={handleVote}
-                                        // State Setters (stable)
-                                        setCommentText={setCommentText}
-                                        setShowAllUsersId={setShowAllUsersId}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </div>
+      <div className="max-w-xl mx-auto">
+        <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 capitalize">
+          {feedFilter === "all" ? "Feed" : `${feedFilter} Posts`}
+        </h2>
 
-                {/* 3. Right Sidebar (Top Rankers) */}
-                <div className="hidden lg:block w-72 h-full border-l border-gray-200 dark:border-gray-800 p-4 shrink-0 overflow-y-auto">
-                    {selectedAuthor ? (
-                        <div className="sticky top-4 bg-white dark:bg-[#1A1A1A] p-4 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800">
-                            <div className="text-center">
-                                <div className="w-20 h-20 rounded-full bg-indigo-500 dark:bg-indigo-700 mx-auto mb-3 flex items-center justify-center text-2xl font-bold text-white shadow-md">
-                                    {selectedAuthor.name?.charAt(0) || "?"}
-                                </div>
-                                <h2 className="xl font-bold truncate">{selectedAuthor.name}</h2>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{selectedAuthor.email}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 italic line-clamp-3">
-                                    {selectedAuthor.description || "No description provided."}
-                                </p>
-
-                                <div className="flex flex-col gap-2 mt-4">
-                                    <button
-                                        className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition-colors duration-200 text-sm font-medium"
-                                        onClick={() => handleProfileRedirect(selectedAuthor)}
-                                    >
-                                        View Full Profile
-                                    </button>
-                                    <button
-                                        className="bg-gray-200 cursor-pointer dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 text-sm font-medium"
-                                        onClick={() => setSelectedAuthor(null)}
-                                    >
-                                        Close Quick View
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="sticky top-4 bg-white dark:bg-[#1A1A1A] p-4 rounded-xl shadow-md border border-gray-100 dark:border-gray-800">
-                            <h3 className="font-bold mb-4 text-lg text-indigo-600 dark:text-indigo-400">🔥 Top 5 Rankers</h3>
-                            <div className="space-y-4">
-                                {/* RANKERS SKELETON: Show simple loading state for rankers */}
-                                {loading ? (
-                                    Array(5).fill(0).map((_, index) => (
-                                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg animate-pulse">
-                                            <div className="flex items-center space-x-3">
-                                                <div className="text-xl font-extrabold w-6 shrink-0 text-center text-gray-300 dark:text-gray-700">#</div>
-                                                <div className="flex flex-col leading-tight space-y-1">
-                                                    <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-20"></div>
-                                                    <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-24"></div>
-                                                </div>
-                                            </div>
-                                            <div className="text-right shrink-0 space-y-1">
-                                                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
-                                                <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-10"></div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : topRankers.length === 0 ? (
-                                     <p className="text-sm text-gray-500 dark:text-gray-400 italic">No rankers found.</p>
-                                ) : (
-                                    topRankers.map((user, index) => (
-                                        <div 
-                                            key={user._id} 
-                                            onClick={() => setSelectedAuthor(user)}
-                                            className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/70 transition-colors"
-                                        >
-                                            <div className="flex items-center space-x-3">
-                                                <div className={cn(
-                                                    "text-xl font-extrabold w-6 shrink-0 text-center",
-                                                    index === 0 ? "text-yellow-500" : 
-                                                    index === 1 ? "text-gray-400" :
-                                                    index === 2 ? "text-yellow-700 dark:text-yellow-600" :
-                                                    "text-indigo-500"
-                                                )}>
-                                                    #{index + 1}
-                                                </div>
-                                                <div className="flex flex-col leading-tight">
-                                                    <span className="text-sm font-semibold truncate max-w-[120px]">{user.name || 'Anonymous'}</span>
-                                                    <span className="text-xs text-gray-500 dark:text-gray-400">{user.email}</span>
-                                                </div>
-                                            </div>
-                                            <div className="text-right shrink-0">
-                                                <span className="text-sm font-bold text-green-600 dark:text-green-400">{user.streak || 0}d streak</span>
-                                                <span className="block text-xs text-gray-500 dark:text-gray-400">{user.postsCount || 0} posts</span>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* --- MODALS --- */}
-
-                {/* Type Selection Modal */}
-                {showTypeSelectionModal && (
-                    <TypeSelectionModal
-                        handleTypeSelection={handleTypeSelection}
-                        setShowTypeSelectionModal={setShowTypeSelectionModal}
-                    />
-                )}
-
-                {/* Specific Post Creation Modal */}
-                {showModal && (
-                    <PostCreationModal
-                        postType={postType}
-                        formData={formData}
-                        pollOptions={pollOptions}
-                        projectContact={projectContact}
-                        handleInputChange={handleInputChange}
-                        handlePollChange={handlePollChange}
-                        addPollOption={addPollOption}
-                        handleSubmit={handleSubmit}
-                        setProjectContact={setProjectContact}
-                        setShowModal={setShowModal}
-                    />
-                )}
+        {/* Create Post */}
+        <div className="relative mb-6 bg-white dark:bg-[#1A1A1A] p-4 rounded-xl shadow-md border border-gray-100 dark:border-gray-800 transition-colors duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-indigo-500 dark:bg-indigo-600 mr-3 flex items-center justify-center text-white text-lg font-semibold shrink-0">
+                {loggedInUserEmail?.charAt(0).toUpperCase() || "U"}
+              </div>
+              <span className="text-gray-600 dark:text-gray-300">What's on your mind?</span>
             </div>
+            <button
+              onClick={() => handlePostAction("Create")}
+              className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-full shadow-lg hover:bg-indigo-700 transition-colors duration-200 text-sm font-medium"
+            >
+              Create Post
+            </button>
+          </div>
         </div>
+
+        {/* Posts Feed */}
+<div className="space-y-6 ">
+          {loading ? (
+            <>
+              <PostSkeleton />
+              <PostSkeleton />
+              <PostSkeleton />
+            </>
+          ) : postsWithAuthors.length === 0 ? (
+            <div className="text-center py-10 text-gray-500 dark:text-gray-400 italic">
+              No {feedFilter !== "all" ? `${feedFilter} ` : ""}posts yet. Be the first to post!
+            </div>
+          ) : (
+            postsWithAuthors.map((post) => (
+              <PostItem
+                key={post._id}
+                post={post}
+                currentLikes={postLikes[post._id] ?? post.likes}
+                isLiked={userLikes.has(post._id)}
+                loggedInUserEmail={loggedInUserEmail}
+                users={users}
+                openInteractionId={openInteractionId}
+                commentText={commentText}
+                showAllUsersId={showAllUsersId}
+                handleLikeToggle={handleLikeToggle}
+                handleInteractionListToggle={handleInteractionListToggle}
+                handleInteractionSubmission={handleInteractionSubmission}
+                handlePostAction={handlePostAction}
+                setSelectedAuthor={setSelectedAuthor}
+                handleVote={handleVote}
+                setCommentText={setCommentText}
+                setShowAllUsersId={setShowAllUsersId}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+
+    {/* 3. Right Sidebar */}
+    <div className="hidden lg:block w-64 h-full border-l border-gray-200 dark:border-gray-800 p-4  shrink-0 overflow-y-auto bg-gray-50 dark:bg-[#1A1A1A] transition-colors duration-300">
+      {selectedAuthor ? (
+        <div className="sticky top-4 bg-white dark:bg-[#1A1A1A] p-4 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 transition-colors duration-300">
+          <div className="text-center">
+            <div className="w-20 h-20 rounded-full bg-indigo-500 dark:bg-indigo-700 mx-auto mb-3 flex items-center justify-center text-2xl font-bold text-white shadow-md">
+              {selectedAuthor.name?.charAt(0) || "?"}
+            </div>
+            <h2 className="font-bold truncate">{selectedAuthor.name}</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{selectedAuthor.email}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 italic line-clamp-3">
+              {selectedAuthor.description || "No description provided."}
+            </p>
+
+            <div className="flex flex-col gap-2 mt-4">
+              <button
+                className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition-colors duration-200 text-sm font-medium"
+                onClick={() => handleProfileRedirect(selectedAuthor)}
+              >
+                View Full Profile
+              </button>
+              <button
+                className="bg-gray-200 cursor-pointer dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 text-sm font-medium"
+                onClick={() => setSelectedAuthor(null)}
+              >
+                Close Quick View
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="sticky top-4 bg-white dark:bg-[#1A1A1A] p-4 rounded-xl shadow-md border border-gray-100 dark:border-gray-800 transition-colors duration-300">
+          <h3 className="font-bold mb-4 text-lg text-indigo-600 dark:text-indigo-400">🔥 Top 5 Rankers</h3>
+          <div className="space-y-4">
+            {loading ? (
+              Array(5)
+                .fill(0)
+                .map((_, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg animate-pulse">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-xl font-extrabold w-6 shrink-0 text-center text-gray-300 dark:text-gray-700">#</div>
+                      <div className="flex flex-col leading-tight space-y-1">
+                        <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-20"></div>
+                        <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-24"></div>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0 space-y-1">
+                      <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-10"></div>
+                    </div>
+                  </div>
+                ))
+            ) : topRankers.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic">No rankers found.</p>
+            ) : (
+              topRankers.map((user, index) => (
+                <div
+                  key={user._id}
+                  onClick={() => setSelectedAuthor(user)}
+                  className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/60 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/70 transition-colors duration-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div
+                      className={cn(
+                        "text-xl font-extrabold w-6 shrink-0 text-center",
+                        index === 0
+                          ? "text-yellow-500"
+                          : index === 1
+                          ? "text-gray-400"
+                          : index === 2
+                          ? "text-yellow-700 dark:text-yellow-600"
+                          : "text-indigo-500"
+                      )}
+                    >
+                      #{index + 1}
+                    </div>
+                    <div className="flex flex-col leading-tight">
+                      <span className="text-sm font-semibold truncate max-w-[120px]">{user.name || "Anonymous"}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{user.email}</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-sm font-bold text-green-600 dark:text-green-400">{user.streak || 0}d</span>
+                    <span className="block text-xs text-gray-500 dark:text-gray-400">{user.postsCount || 0} posts</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+
+    {/* Modals */}
+    {showTypeSelectionModal && (
+      <TypeSelectionModal handleTypeSelection={handleTypeSelection} setShowTypeSelectionModal={setShowTypeSelectionModal} />
+    )}
+
+    {showModal && (
+      <PostCreationModal
+        postType={postType}
+        formData={formData}
+        pollOptions={pollOptions}
+        projectContact={projectContact}
+        handleInputChange={handleInputChange}
+        handlePollChange={handlePollChange}
+        addPollOption={addPollOption}
+        handleSubmit={handleSubmit}
+        setProjectContact={setProjectContact}
+        setShowModal={setShowModal}
+      />
+    )}
+  </div>
+</div>
+
     );
 };
 
